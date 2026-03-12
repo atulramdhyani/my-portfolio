@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study — The Gamut</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --paper:#f0ead8; --paper2:#e8e0c8; --paper3:#d8cfb5;
+  --ink:#0f0d09; --ink2:#28231a; --ink3:#52493c; --ink4:#8a8070; --ink5:#b8b0a0;
+  --red:#a01818; --red2:#c42020;
+  --display:'Playfair Display',serif; --body:'Source Serif 4',serif;
+  --mono:'DM Mono',monospace; --black:'UnifrakturMaguntia',cursive;
+  --pad:40px; --col:680px;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--paper2);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.7;overflow-x:hidden;cursor:none;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:7000;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)' opacity='0.032'/%3E%3C/svg%3E");
+  mix-blend-mode:multiply;opacity:.55;}
+::selection{background:#f5e03a;color:var(--ink);}
+
+/* ── CURSOR ── */
+#cursor{position:fixed;width:10px;height:10px;border-radius:50%;background:var(--red);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;transition:width .2s,height .2s;}
+#cursor.hover{width:26px;height:26px;opacity:.35;}
+
+/* ── INK TRAIL ── */
+@keyframes inkFade{0%{opacity:.22;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.15)}}
+.ink-trail{position:fixed;border-radius:50%;background:var(--red);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);mix-blend-mode:multiply;animation:inkFade .8s ease forwards;}
+
+/* ── TICKER ── */
+.ticker{background:var(--ink);color:var(--paper);height:28px;overflow:hidden;display:flex;align-items:center;}
+.ticker-inner{white-space:nowrap;animation:tick 32s linear infinite;font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;display:inline-block;}
+.ticker:hover .ticker-inner{animation-play-state:paused;}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker-sep{color:var(--red2);margin:0 16px;}
+
+/* ── WRAPPER ── */
+.newspaper{max-width:1100px;margin:0 auto;background:var(--paper);box-shadow:-1px 0 0 rgba(0,0,0,.06),1px 0 0 rgba(0,0,0,.06),0 0 80px rgba(0,0,0,.1);}
+
+/* ── MASTHEAD ── */
+.masthead{padding:16px var(--pad) 0;border-bottom:3px double var(--ink);}
+.mh-top{display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;border-bottom:1px solid var(--ink);font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink4);gap:12px;flex-wrap:wrap;}
+.mh-back{display:flex;align-items:center;gap:6px;color:var(--ink3);text-decoration:none;font-weight:500;transition:color .15s;}
+.mh-back:hover{color:var(--red);}
+.mh-title{font-family:var(--black);font-size:clamp(40px,8vw,80px);line-height:.9;text-align:center;padding:6px 0 8px;letter-spacing:.01em;}
+.mh-title a{text-decoration:none;color:var(--ink);transition:color .2s;}
+.mh-title a:hover{color:var(--red);}
+.mh-bottom{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;border-top:1px solid var(--ink);padding:6px 0 14px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);}
+.mh-bottom .center{font-family:var(--body);font-style:italic;font-size:11px;color:var(--ink4);text-transform:none;letter-spacing:0;text-align:center;padding:0 16px;}
+.mh-bottom .right{text-align:right;}
+
+/* ── PROGRESS BAR ── */
+#read-progress{position:fixed;top:0;left:0;width:3px;height:0;background:var(--red);z-index:8000;transition:height .1s linear;}
+
+/* ── HERO ── */
+.cs-hero{padding:36px var(--pad) 32px;border-bottom:1px solid var(--ink3);}
+.cs-hero-kicker{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--red);margin-bottom:14px;}
+.cs-hero-kicker::before{content:'★';font-size:8px;}
+.kicker-co{color:var(--ink2);font-weight:500;padding-left:2px;}
+.kicker-co::before{content:'──';color:var(--ink5);margin-right:8px;letter-spacing:-.08em;}
+.cs-hero-title{font-family:var(--display);font-size:clamp(32px,5.5vw,64px);font-weight:900;line-height:.95;letter-spacing:-.02em;color:var(--ink);margin-bottom:16px;}
+.cs-hero-dek{font-family:var(--display);font-style:italic;font-size:clamp(16px,2vw,22px);line-height:1.45;color:var(--ink3);max-width:640px;margin-bottom:20px;}
+.cs-hero-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.cs-hero-tag{font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--ink5);border:1px solid var(--paper3);padding:3px 10px;}
+
+/* ── BODY LAYOUT ── */
+.cs-body{display:block;}
+.cs-main{padding:32px var(--pad) 40px;max-width:760px;}
+
+/* ── SECTION HEADERS ── */
+.cs-section{margin-bottom:36px;}
+.cs-section-flag{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid var(--ink);}
+.csf-label{font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink4);}
+.csf-num{font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:var(--ink5);}
+.csf-rule{flex:1;height:1px;background:var(--ink5);}
+
+/* ── THE BRIEF ── */
+.brief-grid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--ink5);border-left:1px solid var(--ink5);}
+.brief-grid::after{content:'';display:none;}
+.brief-field{background:var(--paper);padding:16px 18px;border-right:1px solid var(--ink5);border-bottom:1px solid var(--ink5);}
+.bf-label{font-family:var(--mono);font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--red);margin-bottom:6px;}
+.bf-value{font-size:13px;line-height:1.65;color:var(--ink3);}
+.bf-value.empty{color:var(--ink5);font-style:italic;}
+
+/* Full-width brief field */
+.brief-field.full{grid-column:1/-1;}
+
+/* ── PROSE (work narrative) ── */
+.cs-prose p{font-size:14px;line-height:1.85;color:var(--ink3);margin-bottom:18px;}
+.cs-prose p:last-child{margin-bottom:0;}
+.cs-prose strong{color:var(--ink);font-weight:600;}
+.cs-prose em{font-style:italic;color:var(--ink2);}
+.cs-prose.empty{font-size:13px;color:var(--ink5);font-style:italic;padding:16px 0;}
+
+/* ── OUTCOMES ── */
+.outcomes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(160px,100%),1fr));border-top:1px solid var(--ink5);border-left:1px solid var(--ink5);}
+.outcome-cell{background:var(--paper);padding:18px 20px;border-right:1px solid var(--ink5);border-bottom:1px solid var(--ink5);}
+.oc-num{font-family:var(--display);font-size:clamp(28px,4vw,42px);font-weight:900;color:var(--red);line-height:1;display:block;margin-bottom:4px;}
+.oc-label{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);display:block;}
+.oc-detail{font-size:11px;color:var(--ink3);margin-top:6px;line-height:1.5;}
+.outcome-cell.empty .oc-num{color:var(--ink5);font-size:20px;}
+
+/* ── DECK LINK ── */
+.deck-block{border:1px solid var(--paper3);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;transition:background .15s,border-color .15s;}
+.deck-block:hover{background:var(--paper2);border-color:var(--ink5);}
+.deck-block.no-link{opacity:.5;pointer-events:none;}
+.db-left{}
+.db-label{font-family:var(--mono);font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink5);margin-bottom:4px;}
+.db-title{font-family:var(--display);font-size:16px;font-weight:700;color:var(--ink);}
+.db-hint{font-size:12px;color:var(--ink4);font-style:italic;margin-top:2px;}
+.db-cta{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper);background:var(--ink);padding:10px 16px;text-decoration:none;white-space:nowrap;transition:background .15s;flex-shrink:0;}
+.db-cta:hover{background:var(--red);}
+
+
+
+/* ── NAV ── */
+.cs-nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:20px var(--pad);border-top:2px solid var(--ink);gap:16px;}
+.cs-nav-prev,.cs-nav-next{text-decoration:none;display:flex;flex-direction:column;gap:4px;}
+.cs-nav-prev{align-items:flex-start;}
+.cs-nav-next{align-items:flex-end;}
+.cn-dir{font-family:var(--mono);font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink5);}
+.cn-title{font-family:var(--display);font-size:15px;font-weight:700;color:var(--ink);transition:color .15s;}
+.cs-nav-prev:hover .cn-title,.cs-nav-next:hover .cn-title{color:var(--red);}
+.cn-empty{color:var(--ink5);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;}
+.cs-nav-center{text-align:center;}
+.cs-nav-all{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink4);text-decoration:none;border-bottom:1px solid var(--ink5);padding-bottom:1px;transition:color .15s,border-color .15s;}
+.cs-nav-all:hover{color:var(--red);border-color:var(--red);}
+
+/* ── FOOTER ── */
+.cs-footer{padding:16px var(--pad);display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--ink5);}
+.cf-left{font-family:var(--black);font-size:20px;}
+.cf-left a{text-decoration:none;color:var(--ink);transition:color .2s;}
+.cf-left a:hover{color:var(--red);}
+.cf-right{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink4);display:flex;gap:20px;}
+.cf-right a{color:var(--ink4);text-decoration:none;transition:color .15s;}
+.cf-right a:hover{color:var(--red);}
+
+/* ── 404 STATE ── */
+.cs-404{padding:80px var(--pad);text-align:center;}
+.cs-404 h2{font-family:var(--display);font-size:48px;font-weight:900;color:var(--ink);margin-bottom:12px;}
+.cs-404 p{font-size:14px;color:var(--ink4);margin-bottom:24px;}
+.cs-404 a{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);border-bottom:1px solid var(--ink5);text-decoration:none;padding-bottom:2px;transition:color .15s,border-color .15s;}
+.cs-404 a:hover{color:var(--red);border-color:var(--red);}
+
+/* ── REVEAL ── */
+.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease;}
+.reveal.vis{opacity:1;transform:translateY(0);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:800px){
+  .cs-main{padding-right:var(--pad);}
+}
+@media(max-width:700px){
+  :root{--pad:20px;}
+  .mh-bottom{grid-template-columns:1fr 1fr;}
+  .mh-bottom .center{display:none;}
+  .brief-grid{grid-template-columns:1fr;}
+  .brief-field.full{grid-column:auto;}
+  .cs-nav{grid-template-columns:1fr 1fr;gap:12px;}
+  .cs-nav-center{grid-column:1/-1;order:3;}
+  .outcomes-grid{grid-template-columns:1fr 1fr;}
+  .cs-footer{flex-direction:column;gap:10px;align-items:flex-start;}
+}
+@media(max-width:480px){
+  .mh-title{font-size:clamp(32px,12vw,56px);}
+  .cs-nav{grid-template-columns:1fr;}
+  .cs-nav-next{align-items:flex-start;}
+  .db-block{flex-direction:column;align-items:flex-start;gap:12px;}
+  .cs-hero-title{letter-spacing:-.01em;}
+}
+@media(hover:none){body{cursor:auto;}#cursor{display:none!important;}}
+
+/* ── OVERFLOW & TEXT RESILIENCE ── */
+.cs-hero-title,.cs-hero-dek,.bf-value,.oc-label,.oc-detail,
+.db-title,.db-hint,.cn-title,.cs-prose p,.cf-left,.cf-right {
+  overflow-wrap:break-word;
+  word-break:break-word;
+}
+.cs-hero-title { hyphens:auto; }
+.cs-nav-prev,.cs-nav-next,.cs-nav { min-width:0; }
+.cn-title { overflow-wrap:break-word; }
+.db-block { flex-wrap:wrap; }
+.cs-footer { flex-wrap:wrap; gap:10px; }
+.cf-right { flex-wrap:wrap; gap:12px; }
+.mh-top { flex-wrap:wrap; gap:8px; }
+.mh-bottom > * { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.mh-bottom .center { white-space:normal; }
+.cs-hero-tags { flex-wrap:wrap; }
+.brief-field,.outcome-cell { overflow:hidden; }
+.bf-label,.oc-label { overflow-wrap:break-word; }
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="read-progress"></div>
+
+<div class="newspaper" id="newspaper">
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <span class="ticker-inner">
+      Established in 2018 <span class="ticker-sep">•</span> Poetry Enthusiast <span class="ticker-sep">•</span> Proudly Indian <span class="ticker-sep">•</span> Open for Projects <span class="ticker-sep">•</span> Vibe Coder <span class="ticker-sep">•</span> AI Builder <span class="ticker-sep">•</span> Systems Thinker <span class="ticker-sep">•</span>&nbsp;
+      Established in 2018 <span class="ticker-sep">•</span> Poetry Enthusiast <span class="ticker-sep">•</span> Proudly Indian <span class="ticker-sep">•</span> Open for Projects <span class="ticker-sep">•</span> Vibe Coder <span class="ticker-sep">•</span> AI Builder <span class="ticker-sep">•</span> Systems Thinker <span class="ticker-sep">•</span>&nbsp;
+    </span>
+  </div>
+
+  <!-- MASTHEAD -->
+  <div class="masthead">
+    <div class="mh-top">
+      <a href="case-studies.html" class="mh-back">← All work</a>
+      <span id="mh-date">—</span>
+      <span id="mh-discipline">Case Study</span>
+    </div>
+    <div class="mh-title"><a href="index.html">The Gamut</a></div>
+    <div class="mh-bottom">
+      <span id="mh-company">—</span>
+      <span class="center" id="mh-tagline">A record of work across product, content, and brand</span>
+      <span class="right">By Atul</span>
+    </div>
+  </div>
+
+  <!-- PAGE CONTENT — injected by JS -->
+  <div id="cs-content"></div>
+
+  <!-- FOOTER -->
+  <div class="cs-footer">
+    <div class="cf-left"><a href="index.html">The Gamut</a></div>
+    <div class="cf-right">
+      <a href="index.html">← Home</a>
+      <a href="case-studies.html">All work</a>
+      <a href="index.html#contact">Get in touch</a>
+    </div>
+  </div>
+
+</div><!-- /newspaper -->
+
+<script src="projects.js"></script>
+<script>
+/* ════════════════════════════════════════════════════════
+   PROJECTS — keep in sync with portfolio-gamut-v2.html
+   and case-studies.html
+════════════════════════════════════════════════════════ */
+// PROJECTS loaded from projects.js
+
+/* ════════════════════════════════════════════════════════
+   RENDERER
+════════════════════════════════════════════════════════ */
+(function init() {
+  /* ── Date ── */
+  const d = new Date();
+  document.getElementById('mh-date').textContent =
+    d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).toUpperCase();
+
+  /* ── Get ID from URL ── */
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  const liveProjects = PROJECTS.filter(p => p.live);
+  // If no id in URL, show first project (useful for previewing)
+  const project = liveProjects.find(p => p.id === id) || (!id ? liveProjects[0] : null);
+
+  /* ── 404 state ── */
+  if (!project) {
+    document.getElementById('cs-content').innerHTML = `
+      <div class="cs-404">
+        <h2>Story not found.</h2>
+        <p>This case study doesn't exist yet — or hasn't been published.</p>
+        <a href="case-studies.html">← Back to all work</a>
+      </div>`;
+    return;
+  }
+
+  /* ── Update page title + masthead ── */
+  document.title = `${project.title} — The Gamut`;
+  document.getElementById('mh-discipline').textContent = project.disciplineLabel;
+  document.getElementById('mh-company').textContent = project.companyLabel;
+  document.getElementById('mh-tagline').textContent = project.dek;
+
+  /* ── Prev / Next ── */
+  const idx = liveProjects.indexOf(project);
+  const prev = liveProjects[idx - 1] || null;
+  const next = liveProjects[idx + 1] || null;
+
+  /* ── Brief fields helper ── */
+  function briefField(label, value, full = false) {
+    const isEmpty = !value || value.trim() === '';
+    return `<div class="brief-field${full ? ' full' : ''}">
+      <div class="bf-label">${label}</div>
+      <div class="bf-value${isEmpty ? ' empty' : ''}">${isEmpty ? 'To be added' : value}</div>
+    </div>`;
+  }
+
+  /* ── Outcomes ── */
+  const outcomesHtml = project.outcomes && project.outcomes.length
+    ? `<div class="outcomes-grid">
+        ${project.outcomes.map(o => `
+          <div class="outcome-cell${o.num === '—' ? ' empty' : ''}">
+            <span class="oc-num">${o.num}</span>
+            <span class="oc-label">${o.label}</span>
+            ${o.detail ? `<div class="oc-detail">${o.detail}</div>` : ''}
+          </div>`).join('')}
+      </div>`
+    : '';
+
+  /* ── Deck block ── */
+  const hasDeck = project.deckUrl && project.deckUrl.trim() !== '';
+  const deckHtml = `
+    <a href="${hasDeck ? project.deckUrl : '#'}" target="${hasDeck ? '_blank' : '_self'}" class="deck-block${hasDeck ? '' : ' no-link'}">
+      <div class="db-left">
+        <div class="db-label">Presentation deck</div>
+        <div class="db-title">${project.deckLabel || project.title}</div>
+        <div class="db-hint">${hasDeck ? 'Opens in Canva / Figma' : 'Link coming soon'}</div>
+      </div>
+      ${hasDeck ? `<span class="db-cta">View deck →</span>` : ''}
+    </a>`;
+
+  /* ── Body prose ── */
+  const bodyHtml = project.body
+    ? project.body.trim().split('\n\n').map(p => `<p>${p.trim()}</p>`).join('')
+    : '';
+  const isBodyEmpty = !project.body || project.body.includes('Add your narrative here');
+
+  /* ── Nav ── */
+  const navHtml = `
+    <div class="cs-nav">
+      <div>
+        ${prev
+          ? `<a href="${prev.url}" class="cs-nav-prev">
+               <span class="cn-dir">← Previous</span>
+               <span class="cn-title">${prev.title}</span>
+             </a>`
+          : `<span class="cn-empty">First story</span>`}
+      </div>
+      <div class="cs-nav-center">
+        <a href="case-studies.html" class="cs-nav-all">All work</a>
+      </div>
+      <div style="text-align:right">
+        ${next
+          ? `<a href="${next.url}" class="cs-nav-next">
+               <span class="cn-dir">Next →</span>
+               <span class="cn-title">${next.title}</span>
+             </a>`
+          : `<span class="cn-empty">Last story</span>`}
+      </div>
+    </div>`;
+
+
+
+  /* ── Assemble page ── */
+  document.getElementById('cs-content').innerHTML = `
+
+    <!-- HERO -->
+    <div class="cs-hero reveal">
+      <div class="cs-hero-kicker">${project.disciplineLabel} <span class="kicker-co">${project.companyLabel}</span></div>
+      <h1 class="cs-hero-title">${project.title}</h1>
+      <p class="cs-hero-dek">${project.dek}</p>
+      <div class="cs-hero-tags">${(project.tags||[]).map(t=>`<span class="cs-hero-tag">${t}</span>`).join('')}</div>
+    </div>
+
+    <!-- BODY + SIDEBAR -->
+    <div class="cs-body">
+      <div class="cs-main">
+
+        <!-- THE BRIEF -->
+        <div class="cs-section reveal">
+          <div class="cs-section-flag">
+            <span class="csf-label">The Brief</span>
+            <span class="csf-rule"></span>
+            <span class="csf-num">§ 01</span>
+          </div>
+          <div class="brief-grid">
+            ${briefField('Context', project.context)}
+            ${briefField('Problem statement', project.problem)}
+            ${briefField('Stakeholders', project.stakeholders, true)}
+          </div>
+        </div>
+
+        <!-- THE WORK -->
+        ${!isBodyEmpty ? `
+        <div class="cs-section reveal">
+          <div class="cs-section-flag">
+            <span class="csf-label">The Work</span>
+            <span class="csf-rule"></span>
+            <span class="csf-num">§ 02</span>
+          </div>
+          <div class="cs-prose">${bodyHtml}</div>
+        </div>` : ''}
+
+        <!-- KEY OUTCOMES -->
+        <div class="cs-section reveal">
+          <div class="cs-section-flag">
+            <span class="csf-label">Key Outcomes</span>
+            <span class="csf-rule"></span>
+            <span class="csf-num">§ 0${isBodyEmpty ? 2 : 3}</span>
+          </div>
+          ${outcomesHtml}
+        </div>
+
+        <!-- DECK -->
+        <div class="cs-section reveal">
+          <div class="cs-section-flag">
+            <span class="csf-label">Presentation Deck</span>
+            <span class="csf-rule"></span>
+            <span class="csf-num">§ 0${isBodyEmpty ? 3 : 4}</span>
+          </div>
+          ${deckHtml}
+        </div>
+
+      </div>
+    </div>
+
+    <!-- NAV -->
+    ${navHtml}
+  `;
+
+  /* ── Cursor ── */
+  const cursor = document.getElementById('cursor');
+  if (window.matchMedia('(hover:hover) and (pointer:fine)').matches) {
+    let mx=0,my=0,tt;
+    document.addEventListener('mousemove',e=>{
+      mx=e.clientX; my=e.clientY;
+      cursor.style.left=mx+'px'; cursor.style.top=my+'px';
+      clearTimeout(tt);
+      tt=setTimeout(()=>{
+        const dot=document.createElement('div');
+        dot.className='ink-trail';
+        const s=3+Math.random()*4;
+        dot.style.cssText=`left:${mx}px;top:${my}px;width:${s}px;height:${s}px;`;
+        document.body.appendChild(dot);
+        setTimeout(()=>dot.remove(),850);
+      },16);
+    });
+    document.querySelectorAll('a,button').forEach(el=>{
+      el.addEventListener('mouseenter',()=>cursor.classList.add('hover'));
+      el.addEventListener('mouseleave',()=>cursor.classList.remove('hover'));
+    });
+  } else { cursor.style.display='none'; }
+
+  /* ── Read progress bar ── */
+  const prog = document.getElementById('read-progress');
+  window.addEventListener('scroll',()=>{
+    const total = document.body.scrollHeight - window.innerHeight;
+    prog.style.height = ((window.scrollY / total) * 100) + '%';
+  },{passive:true});
+
+  /* ── Reveal on scroll ── */
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('vis'); });
+  },{threshold:0.06});
+  document.querySelectorAll('.reveal').forEach((el,i)=>{
+    el.style.transitionDelay=(i*.08)+'s';
+    io.observe(el);
+  });
+
+})();
+</script>
+</body>
+</html>
