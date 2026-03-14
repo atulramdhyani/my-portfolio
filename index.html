@@ -948,55 +948,113 @@ body::after {
 }
 
 /* ══════════════════
-   ABOUT — 2 col
+   CROSSWORD
 ══════════════════ */
-.lower-wrap {
+.xw-section { padding: 28px var(--pad) 36px; border-bottom: 3px double var(--ink); }
+.xw-wrap { width: 100%; }
+.xw-header {
+  border-top: 3px double var(--ink);
+  border-bottom: 1px solid var(--ink);
+  padding: 10px 0 8px;
+  display: flex; align-items: baseline; gap: 14px;
+  margin-bottom: 24px;
+}
+.xw-flag { font-family: var(--mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--red); }
+.xw-title { font-family: var(--display); font-size: 20px; font-weight: 700; color: var(--ink); line-height: 1; }
+.xw-byline { font-family: var(--mono); font-size: 9px; color: var(--ink4); letter-spacing: .08em; margin-left: auto; }
+.xw-body { display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: start; }
+.xw-grid-wrap { border: 2px solid var(--ink); display: inline-block; background: var(--ink); user-select: none; }
+.xw-grid { display: grid; gap: 2px; }
+.xw-cell { width: 36px; height: 36px; position: relative; background: var(--paper); }
+.xw-cell.black { background: var(--ink); pointer-events: none; }
+.xw-cell-num {
+  position: absolute; top: 2px; left: 3px;
+  font-family: var(--mono); font-size: 7.5px; color: var(--ink3); line-height: 1;
+  pointer-events: none; z-index: 2;
+}
+.xw-cell input {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  border: none; background: transparent; text-align: center;
+  font-family: var(--display); font-size: 15px; font-weight: 700; color: var(--ink);
+  text-transform: uppercase; cursor: pointer; caret-color: transparent;
+  outline: none; padding-top: 7px; z-index: 1;
+}
+.xw-cell.active-word { background: #e0d8c0; }
+.xw-cell.active-cursor input { background: var(--ink2); color: var(--paper); }
+.xw-cell.correct { background: #d4e8c8; transition: background .3s; }
+.xw-cell.correct input { color: #2a5c18; }
+.xw-cell.wrong { animation: xw-shake .35s ease; }
+@keyframes xw-shake {
+  0%,100% { transform: translateX(0); } 20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); }
+}
+@keyframes xw-inkFill { 0% { background: #d4e8c8; } 40% { background: #b8d4a0; } 100% { background: #d4e8c8; } }
+.xw-cell.word-correct { animation: xw-inkFill .5s ease forwards; }
+.xw-clues { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+.xw-clue-group { border-top: 2px solid var(--ink); padding-top: 10px; }
+.xw-clue-label { font-family: var(--mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); font-weight: 500; margin-bottom: 8px; }
+.xw-clue { display: flex; gap: 8px; padding: 4px 6px; border-bottom: 1px solid var(--paper3); cursor: pointer; transition: background .1s; }
+.xw-clue:hover, .xw-clue.active-clue { background: var(--paper2); }
+.xw-clue.solved-clue { color: var(--ink4); text-decoration: line-through; text-decoration-color: var(--ink5); }
+.xw-clue-num { font-family: var(--mono); font-size: 10px; color: var(--red); min-width: 18px; padding-top: 2px; font-weight: 500; }
+.xw-clue-text { font-family: var(--body); font-size: 11.5px; line-height: 1.5; color: var(--ink2); }
+.xw-footer { margin-top: 16px; border-top: 1px solid var(--ink5); padding-top: 10px; display: flex; align-items: center; gap: 12px; }
+.xw-progress-wrap { flex: 1; height: 3px; background: var(--paper3); }
+.xw-progress-bar { height: 100%; background: var(--red); transition: width .4s; width: 0%; }
+.xw-stats { font-family: var(--mono); font-size: 9px; color: var(--ink4); letter-spacing: .06em; }
+.xw-btn {
+  font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ink3); background: none; border: 1px solid var(--ink5); padding: 4px 10px;
+  cursor: pointer; transition: border-color .15s, color .15s;
+}
+.xw-btn:hover { border-color: var(--ink); color: var(--ink); }
+.xw-solved { display: none; margin-top: 14px; padding: 14px 16px; border: 2px solid var(--ink); background: var(--paper2); text-align: center; }
+.xw-solved.show { display: block; }
+.xw-solved-hed { font-family: var(--display); font-size: 18px; font-style: italic; color: var(--ink); margin-bottom: 3px; }
+.xw-solved-dek { font-family: var(--mono); font-size: 10px; color: var(--ink4); letter-spacing: .08em; }
+@media (max-width: 800px) { .xw-body { grid-template-columns: 1fr; gap: 20px; } }
+@media (max-width: 500px) {
+  .xw-cell { width: 26px; height: 26px; }
+  .xw-cell input { font-size: 11px; padding-top: 4px; }
+  .xw-cell-num { font-size: 6px; }
+  .xw-clues { grid-template-columns: 1fr; }
+  .xw-byline { display: none; }
+}
+
+/* ══════════════════
+   ABOUT — compact
+══════════════════ */
+.about-wrap {
   padding: 0 var(--pad);
   border-bottom: 3px double var(--ink);
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto 1fr;
   gap: 0 32px;
-}
-.lower-col { padding: 22px 0; }
-.lower-col:first-child {
-  border-right: 1px solid var(--ink5);
-  padding-right: 32px;
-}
-
-
-.about-prose p {
-  font-size: 12.5px;
-  line-height: 1.8;
-  color: var(--ink3);
-  margin-bottom: 12px;
-}
-.about-prose strong { color: var(--ink); font-weight: 600; }
-.about-photo { width: 100%; }
-.photo-placeholder {
-  width: 100%;
-  aspect-ratio: 4/5;
-  background: var(--paper3);
-  display: flex;
   align-items: center;
-  justify-content: center;
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--ink5);
+}
+.about-photo-sm { padding: 20px 0; border-right: 1px solid var(--ink5); padding-right: 32px; }
+.about-photo-sm img {
+  width: 140px; height: 175px; object-fit: cover; display: block;
+}
+.photo-placeholder {
+  width: 140px; height: 175px;
+  background: var(--paper3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 9px; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--ink5);
   border: 1px dashed var(--ink5);
 }
-.about-photo img {
-  width: 100%;
-  aspect-ratio: 4/5;
-  object-fit: cover;
-  display: block;
+.about-text { padding: 20px 0; }
+.about-prose p { font-size: 13px; line-height: 1.75; color: var(--ink3); }
+.about-prose strong { color: var(--ink); font-weight: 600; }
+@media (max-width: 600px) {
+  .about-wrap { grid-template-columns: 1fr; }
+  .about-photo-sm { border-right: none; padding-right: 0; border-bottom: 1px solid var(--paper3); padding-bottom: 16px; }
+  .about-photo-sm img, .photo-placeholder { width: 100px; height: 125px; }
 }
 
 @media (max-width:700px) {
   .praise-grid { grid-template-columns: 1fr; }
-  .lower-wrap { grid-template-columns: 1fr; gap: 0; }
-  .lower-col:first-child { border-right: none; padding-right: 0; border-bottom: 1px solid var(--paper3); padding-bottom: 20px; }
 }
 
 /* ══════════════════
@@ -1333,7 +1391,7 @@ body::after {
 
   /* Sections — full width, no side padding excess */
   .hero, .career-wrap, .work-wrap, .side-wrap,
-  .lower-wrap, .contact-wrap { padding-left: 20pt; padding-right: 20pt; }
+  .contact-wrap { padding-left: 20pt; padding-right: 20pt; }
 
   /* Keep columns but simpler */
   .career-grid, .work-grid, .side-grid { gap: 0; }
@@ -1435,7 +1493,6 @@ body::after {
   .bc-text { font-size: 11.5px; }
 
   /* Testimonials + About */
-  .lower-wrap { padding: 0 var(--pad); }
   .about-prose p { font-size: 12px; }
 
   /* Contact */
@@ -1473,8 +1530,6 @@ body::after {
   /* Work hero stack on mobile — handled by work-hero media query in CSS already */
 
   /* Lower section */
-  .lower-wrap { grid-template-columns: 1fr; gap: 0; }
-  .lower-col:first-child { border-right: none; padding-right: 0; border-bottom: 1px solid var(--paper3); padding-bottom: 20px; }
 
   /* Contact */
   .contact-wrap { grid-template-columns: 1fr; gap: 0; padding-left: var(--pad); padding-right: var(--pad); }
@@ -1544,7 +1599,7 @@ body::after {
 .t-card,
 .wh-main,
 .wh-side,
-.lower-col,
+.about-text,
 .contact-left,
 .contact-right,
 .hbr-col,
@@ -1792,36 +1847,64 @@ body::after {
     </div>
   </div>
 
-  <!-- ABOUT -->
-  <div class="sec-flag"><span class="sec-flag-label">About the Editor</span><span class="sec-flag-rule"></span><span class="sec-flag-num">§ 05</span></div>
-  <div class="lower-wrap">
-    <div class="lower-col">
-      <div class="about-prose reveal">
-        <p>Outside of work, you can find Atul reading fiction, playing games, and experimenting with AI. Maybe one day when AI takes over everything, he'll finish writing his anthology.</p>
+  <!-- CROSSWORD -->
+  <div class="sec-flag"><span class="sec-flag-label">Train your brain</span><span class="sec-flag-rule"></span><span class="sec-flag-num">§ 05</span></div>
+  <div class="xw-section">
+    <div class="xw-wrap">
+      <div class="xw-header">
+        <span class="xw-flag">Interactive</span>
+        <span class="xw-title">Crossword</span>
+        <span class="xw-byline">Suggested by the editor</span>
+      </div>
+      <div class="xw-body">
+        <div class="xw-grid-wrap">
+          <div class="xw-grid" id="xw-grid"></div>
+        </div>
+        <div class="xw-clues" id="xw-clues"></div>
+      </div>
+      <div class="xw-footer">
+        <div class="xw-progress-wrap">
+          <div class="xw-progress-bar" id="xw-progress-bar"></div>
+        </div>
+        <span class="xw-stats" id="xw-stats">0 / 8 solved</span>
+        <button class="xw-btn" id="xw-btn-reveal">Reveal</button>
+        <button class="xw-btn" id="xw-btn-reset">Reset</button>
+      </div>
+      <div class="xw-solved" id="xw-solved-msg">
+        <div class="xw-solved-hed">You know him well.</div>
+        <div class="xw-solved-dek">Now you know what to talk about when you reach out.</div>
       </div>
     </div>
-    <div class="lower-col">
-      <div class="about-photo reveal">
-          <img src="atul-zine.jpg" alt="Atul" class="about-photo">
+  </div>
+
+  <!-- ABOUT -->
+  <div class="sec-flag"><span class="sec-flag-label">About the Editor</span><span class="sec-flag-rule"></span><span class="sec-flag-num">§ 06</span></div>
+  <div class="about-wrap">
+    <div class="about-photo-sm reveal">
+      <img src="atul-zine.jpg" alt="Atul">
+    </div>
+    <div class="about-text reveal">
+      <div class="about-prose">
+        <p>Outside of work, you can find Atul reading fiction, playing games, and experimenting with AI. Maybe one day when AI takes over everything, he'll finish writing his anthology.</p>
       </div>
     </div>
   </div>
 
   <!-- CONTACT -->
-  <div class="sec-flag"><span class="sec-flag-label">Correspondence</span><span class="sec-flag-rule"></span><span class="sec-flag-num">§ 06</span></div>
+  <div class="sec-flag"><span class="sec-flag-label">Correspondence</span><span class="sec-flag-rule"></span><span class="sec-flag-num">§ 07</span></div>
   <div class="contact-wrap">
     <div class="contact-left reveal">
       <h2 class="contact-hed">Let's<br><em>talk.</em></h2>
       <p class="contact-sub">Open to full-time roles, freelance projects, and interesting conversations. Preferably over coffee.</p>
       <div class="contact-ctas">
-        <a href="mailto:atulramdhyani.work@gmail.com" class="cta-main-c" id="emailLink">Send a message →</a>
+        <a href="mailto:atul@email.com" class="cta-main-c" id="emailLink">Send a message →</a>
         <a href="resume.pdf" download class="cta-ghost-c">↓ Download résumé</a>
       </div>
     </div>
     <div class="contact-right reveal">
       <div class="contact-links">
-        <a href="mailto:atulramdhyani.work@gmail.com" class="c-link" id="emailLink2">
-          <span class="c-k">Email</span><span class="c-v">atulramdhyani.work@gmail.com</span><span class="c-arr">→</span>
+        <a href="mailto:atul@email.com" class="c-link" id="emailLink2">
+          <span class="c-k">Email</span><span class="c-v">atul@email.com</span><span class="c-arr">→</span>
         </a>
         <a href="https://https://www.linkedin.com/in/atul-ramdhyani/" target="_blank" class="c-link">
           <span class="c-k">LinkedIn</span><span class="c-v">https://www.linkedin.com/in/atul-ramdhyani/</span><span class="c-arr">→</span>
@@ -2154,6 +2237,198 @@ printBtn?.addEventListener('click', () => {
 });
 printBtn?.addEventListener('mouseenter', () => cursor.classList.add('hover'));
 printBtn?.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+
+/* ── CROSSWORD ── */
+(function() {
+  var WORDS = [
+    {id:'heisenberg',answer:'HEISENBERG',dir:'down',  row:0,col:4, num:1, clue:"You know my name. (Walter White’s alter ego)"},
+    {id:'hades',     answer:'HADES',     dir:'across',row:0,col:4, num:1, clue:'Greek god of the underworld. Also a perfect game.'},
+    {id:'coffee',    answer:'COFFEE',    dir:'across',row:1,col:0, num:4, clue:'The only thing keeping this editor upright.'},
+    {id:'indie',     answer:'INDIE',     dir:'across',row:2,col:4, num:5, clue:'Genre of choice. Small teams, big feelings.'},
+    {id:'superman',  answer:'SUPERMAN',  dir:'across',row:3,col:4, num:9, clue:'First DC superhero.'},
+    {id:'mountain',  answer:'MOUNTAIN',  dir:'across',row:5,col:1, num:12,clue:'Where Atul would rather be than anywhere else.'},
+    {id:'franklin',  answer:'FRANKLIN',  dir:'down',  row:0,col:11,num:3, clue:"Strongest mutant in Marvel. Xavier’s student."},
+    {id:'anthology', answer:'ANTHOLOGY', dir:'down',  row:3,col:10,num:10,clue:'What he keeps starting but never finishing.'}
+  ];
+  var ROWS=12,COLS=12,cellMap={},cellEls={},userGrid={},solvedWords=new Set(),activeWord=null,activeCellKey=null;
+  WORDS.forEach(function(w){
+    for(var i=0;i<w.answer.length;i++){
+      var r=w.dir==='across'?w.row:w.row+i,c=w.dir==='across'?w.col+i:w.col,k=r+','+c;
+      if(!cellMap[k])cellMap[k]={letter:w.answer[i],wordIds:[],num:null};
+      cellMap[k].wordIds.push(w.id);
+    }
+  });
+  WORDS.forEach(function(w){var k=w.row+','+w.col;cellMap[k].num=w.num;});
+  var gridEl=document.getElementById('xw-grid'),cluesEl=document.getElementById('xw-clues');
+  if(!gridEl||!cluesEl)return;
+  gridEl.style.gridTemplateColumns='repeat('+COLS+',auto)';
+  gridEl.style.gridTemplateRows='repeat('+ROWS+',auto)';
+  for(var r=0;r<ROWS;r++){
+    for(var c=0;c<COLS;c++){
+      var k=r+','+c,cell=document.createElement('div');
+      cell.className='xw-cell';cell.dataset.key=k;
+      if(!cellMap[k]){cell.classList.add('black');}
+      else{
+        var d=cellMap[k];
+        if(d.num!==null){var n=document.createElement('span');n.className='xw-cell-num';n.textContent=d.num;cell.appendChild(n);}
+        var inp=document.createElement('input');
+        inp.type='text';inp.maxLength=1;inp.autocomplete='off';inp.spellcheck=false;inp.dataset.key=k;
+        (function(key){
+          inp.addEventListener('mousedown',function(e){e.preventDefault();handleCellClick(key);});
+          inp.addEventListener('keydown',function(e){handleKeyDown(e,key);});
+        })(k);
+        cell.appendChild(inp);
+      }
+      gridEl.appendChild(cell);cellEls[k]=cell;
+    }
+  }
+  var acrossW=WORDS.filter(function(w){return w.dir==='across';}).sort(function(a,b){return a.num-b.num;});
+  var downW=WORDS.filter(function(w){return w.dir==='down';}).sort(function(a,b){return a.num-b.num;});
+  function buildGroup(label,words){
+    var g=document.createElement('div');g.className='xw-clue-group';
+    var l=document.createElement('div');l.className='xw-clue-label';l.textContent=label;g.appendChild(l);
+    words.forEach(function(w){
+      var row=document.createElement('div');row.className='xw-clue';row.dataset.wordId=w.id;
+      row.innerHTML='<span class="xw-clue-num">'+w.num+'</span><span class="xw-clue-text">'+w.clue+'</span>';
+      (function(id){row.addEventListener('click',function(){selectWord(id);});})(w.id);
+      g.appendChild(row);
+    });
+    return g;
+  }
+  cluesEl.appendChild(buildGroup('Across',acrossW));
+  cluesEl.appendChild(buildGroup('Down',downW));
+  function getWordCells(id){
+    var w=WORDS.filter(function(x){return x.id===id;})[0],cells=[];
+    for(var i=0;i<w.answer.length;i++){
+      var r=w.dir==='across'?w.row:w.row+i,c=w.dir==='across'?w.col+i:w.col;
+      cells.push(r+','+c);
+    }
+    return cells;
+  }
+  function selectWord(id,focusKey){
+    activeWord=id;var cells=getWordCells(id);
+    if(!focusKey||cells.indexOf(focusKey)<0)focusKey=cells.filter(function(k){return !userGrid[k];})[0]||cells[0];
+    activeCellKey=focusKey;updateHighlights();
+    var inp=cellEls[focusKey]&&cellEls[focusKey].querySelector('input');if(inp)inp.focus();
+    document.querySelectorAll('.xw-clue').forEach(function(el){el.classList.toggle('active-clue',el.dataset.wordId===id);});
+  }
+  function handleCellClick(k){
+    var words=(cellMap[k]&&cellMap[k].wordIds)||[];if(!words.length)return;
+    if(activeCellKey===k&&words.length>1){
+      var other=words.filter(function(id){return id!==activeWord;})[0];selectWord(other,k);
+    } else {
+      var pref=words.indexOf(activeWord)>=0?activeWord:words[0];selectWord(pref,k);
+    }
+    activeCellKey=k;updateHighlights();
+  }
+  function handleKeyDown(e,k){
+    if(!activeWord)return;
+    var w=WORDS.filter(function(x){return x.id===activeWord;})[0];
+    var cells=getWordCells(activeWord),idx=cells.indexOf(k);
+    if(e.key==='Tab'){
+      e.preventDefault();
+      var all=acrossW.concat(downW),cur=all.map(function(x){return x.id;}).indexOf(activeWord);
+      selectWord(all[(cur+(e.shiftKey?all.length-1:1))%all.length].id);return;
+    }
+    if(/^Arrow/.test(e.key)){
+      e.preventDefault();
+      var isAcross=e.key==='ArrowRight'||e.key==='ArrowLeft';
+      var isDown=e.key==='ArrowDown'||e.key==='ArrowUp';
+      var words=(cellMap[k]&&cellMap[k].wordIds)||[];
+      if(isAcross&&w.dir==='down'){
+        var aw=words.filter(function(id){return WORDS.filter(function(x){return x.id===id;})[0].dir==='across';})[0];
+        if(aw){selectWord(aw,k);return;}
+      }else if(isDown&&w.dir==='across'){
+        var dw=words.filter(function(id){return WORDS.filter(function(x){return x.id===id;})[0].dir==='down';})[0];
+        if(dw){selectWord(dw,k);return;}
+      }
+      var delta=(e.key==='ArrowRight'||e.key==='ArrowDown')?1:-1;
+      var next=cells[idx+delta];
+      if(next){activeCellKey=next;updateHighlights();var ni=cellEls[next]&&cellEls[next].querySelector('input');if(ni)ni.focus();}
+      return;
+    }
+    if(e.key==='Backspace'){
+      e.preventDefault();
+      if(userGrid[k]){
+        delete userGrid[k];var inp=cellEls[k]&&cellEls[k].querySelector('input');if(inp)inp.value='';
+        cellEls[k]&&cellEls[k].classList.remove('correct');
+      }else if(idx>0){
+        var prev=cells[idx-1];delete userGrid[prev];
+        var pi=cellEls[prev]&&cellEls[prev].querySelector('input');if(pi)pi.value='';
+        cellEls[prev]&&cellEls[prev].classList.remove('correct');
+        activeCellKey=prev;updateHighlights();if(pi)pi.focus();
+      }
+      return;
+    }
+    if(/^[a-zA-Z]$/.test(e.key)){
+      e.preventDefault();
+      var letter=e.key.toUpperCase();
+      userGrid[k]=letter;var inp=cellEls[k]&&cellEls[k].querySelector('input');if(inp)inp.value=letter;
+      cellEls[k]&&cellEls[k].classList.remove('wrong');
+      checkWord(activeWord);
+      var next=cells[idx+1];
+      if(next){activeCellKey=next;updateHighlights();var ni=cellEls[next]&&cellEls[next].querySelector('input');if(ni)ni.focus();}
+    }
+  }
+  function checkWord(id){
+    var w=WORDS.filter(function(x){return x.id===id;})[0],cells=getWordCells(id);
+    if(!cells.every(function(k){return userGrid[k];}))return;
+    var correct=cells.every(function(k,i){return userGrid[k]===w.answer[i];});
+    if(correct){
+      solvedWords.add(id);
+      cells.forEach(function(k){
+        cellEls[k]&&cellEls[k].classList.add('correct','word-correct');
+        setTimeout(function(){cellEls[k]&&cellEls[k].classList.remove('word-correct');},600);
+      });
+      var clueEl=document.querySelector('.xw-clue[data-word-id="'+id+'"]');
+      if(clueEl)clueEl.classList.add('solved-clue');
+      updateProgress();
+      if(solvedWords.size===WORDS.length){var sm=document.getElementById('xw-solved-msg');if(sm)sm.classList.add('show');}
+    }else{
+      cells.forEach(function(k,i){
+        if(userGrid[k]!==w.answer[i]){
+          cellEls[k]&&cellEls[k].classList.add('wrong');
+          setTimeout(function(){cellEls[k]&&cellEls[k].classList.remove('wrong');},400);
+        }
+      });
+    }
+  }
+  function updateHighlights(){
+    Object.keys(cellEls).forEach(function(k){cellEls[k].classList.remove('active-word','active-cursor');});
+    if(!activeWord)return;
+    getWordCells(activeWord).forEach(function(k){cellEls[k]&&cellEls[k].classList.add('active-word');});
+    if(activeCellKey)cellEls[activeCellKey]&&cellEls[activeCellKey].classList.add('active-cursor');
+  }
+  function updateProgress(){
+    var pct=(solvedWords.size/WORDS.length)*100;
+    var pb=document.getElementById('xw-progress-bar');if(pb)pb.style.width=pct+'%';
+    var st=document.getElementById('xw-stats');if(st)st.textContent=solvedWords.size+' / '+WORDS.length+' solved';
+  }
+  var revBtn=document.getElementById('xw-btn-reveal');
+  if(revBtn)revBtn.addEventListener('click',function(){
+    if(!activeWord)return;
+    var w=WORDS.filter(function(x){return x.id===activeWord;})[0],cells=getWordCells(activeWord);
+    cells.forEach(function(k,i){
+      userGrid[k]=w.answer[i];var inp=cellEls[k]&&cellEls[k].querySelector('input');if(inp)inp.value=w.answer[i];
+      cellEls[k]&&cellEls[k].classList.add('correct');
+    });
+    solvedWords.add(activeWord);
+    var clueEl=document.querySelector('.xw-clue[data-word-id="'+activeWord+'"]');if(clueEl)clueEl.classList.add('solved-clue');
+    updateProgress();
+    if(solvedWords.size===WORDS.length){var sm=document.getElementById('xw-solved-msg');if(sm)sm.classList.add('show');}
+  });
+  var rstBtn=document.getElementById('xw-btn-reset');
+  if(rstBtn)rstBtn.addEventListener('click',function(){
+    userGrid={};solvedWords.clear();activeWord=null;activeCellKey=null;
+    document.querySelectorAll('.xw-cell input').forEach(function(el){el.value='';});
+    document.querySelectorAll('.xw-cell').forEach(function(el){el.classList.remove('correct','wrong','active-word','active-cursor','word-correct');});
+    document.querySelectorAll('.xw-clue').forEach(function(el){el.classList.remove('active-clue','solved-clue');});
+    var sm=document.getElementById('xw-solved-msg');if(sm)sm.classList.remove('show');
+    updateProgress();
+  });
+  selectWord('hades');
+  updateProgress();
+})();
 </script>
 </body>
 </html>
